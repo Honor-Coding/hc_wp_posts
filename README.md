@@ -1,2 +1,2 @@
-# hc_wp_posts
+# WP Posts
  Displays wordpress posts

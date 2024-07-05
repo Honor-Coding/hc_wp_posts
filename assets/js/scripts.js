@@ -1,0 +1,6 @@
+/*
+ * WP Posts - Plugin scripts
+ */
+
+
+

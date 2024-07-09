@@ -57,7 +57,7 @@ if( ! class_exists( 'HC_Posts' ) ) {
                  *                                 - can be names, slugs or ids 
                  * @return array of posts (see get_posts)
                  */
-                public function get_posts_by_category( $categories ) {
+                public function get_posts_by_category( $categories = '' ) { 
                     
                     $posts = [];
                     
@@ -65,12 +65,36 @@ if( ! class_exists( 'HC_Posts' ) ) {
                     if ( ! is_array( $categories ) ) {
                         $categories = \WPX::simple_explode( $categories );
                     }
-                    
-                    if ( ! empty ( $categories ) ) {
+
+                    // check if a list of names, slugs or ids 
+                    $cat_ids = [];
+                    foreach( $categories as $cat ) {
+               
+                        // if numeric, then assume ids 
+                        $is_number = (int)$cat;
+                        if ( $is_number !== 0 && is_numeric( $is_number ) ) {
+                            $cat_ids[] = $is_number;                            
+                        // if not numeric,
+                        } else {
+                            // check for name 
+                            $term = get_term_by('name', $cat, 'category');
+                            if ( $term ) {
+                                $cat_ids[] = $term->term_id;
+                            } else {
+                                // if not name, check for slug 
+                                $term = get_term_by('slug', $cat, 'category');
+                                if ( $term ) {
+                                    $cat_ids[] = $term->term_id;
+                                }
+                            }                        
+                        }
+                        
+                    }
+                
+                    if ( ! empty ( $cat_ids ) ) {
                         
                         $args = [
-                            // TODO:
-                            // do something depending on whether names, slugs or ids 
+                            'category__in' => \WPX::simple_implode( $cat_ids ),
                         ];
                         
                         $posts = $this->get_posts( $args );
@@ -79,29 +103,45 @@ if( ! class_exists( 'HC_Posts' ) ) {
                     
                     return $posts;
                     
-                }
+                } // end : get_posts_by_category()
                 
                 
                 /**
                  * gets a list of posts, converted to array (not wp_post objects) 
                  * 
-                 * @param array $args
+                 * @param array $args : wp_query args (see: https://developer.wordpress.org/reference/classes/wp_query/) 
+                 * @param string $thumb_size : options = { post-thumbnail, ... }
                  * @return array of [ 'id', 'title', 'excerpt', 'permalink', 'image' ]
                  */
-                public function get_posts( $args ) {
+                public function get_posts( $args = [], $thumb_size = 'post-thumbnail' ) {
                     
                     $posts = [];
                     
-                    // TODO: 
-                    // make adjustments to $args as needed...
+                    if ( ! is_array ( $args ) ) {
+                        $args = [];
+                    }
+                    
+                    if ( ! isset( $args['post_status'] ) ) {
+                        $args['post_status'] = 'publish'; // show only published posts
+                    }
+                    
+                    if ( ! isset( $args['posts_per_page'] ) ) {
+                        $args['posts_per_page'] = '-1'; // show all posts (not paginated) 
+                    }
                     
                     $wp_posts = get_posts( $args );
 
                     foreach( $wp_posts as $wp_post ) {
-
-                        // TODO:
-                        // convert WP_Posts objects into an array called $posts
-                        // get id, title, excerpt, image (sized), permalink... what else? 
+                        
+                        $thumbnail = get_the_post_thumbnail_url( $wp_post->ID, $thumb_size );
+                        
+                        $posts[] = [
+                            'id' => $wp_post->ID,
+                            'title' => $wp_post->post_title,
+                            'excerpt' => $wp_post->post_excerpt,
+                            'link' => get_permalink( $wp_post->ID ),
+                            'thumbnail' => ( $thumbnail ) ? $thumbnail : '',
+                        ];
 
                     }    
                     

@@ -29,6 +29,9 @@ define( 'HC_WP_POSTS_PATH', plugin_dir_path(__FILE__) );
 // PLUGIN TOOLS
 // --------------------------------------------------
 
+// general wordpress tools 
+require_once HC_WP_POSTS_PATH . 'includes/class-hc-wpx.php';  
+
 // handles post data 
 require_once HC_WP_POSTS_PATH . 'includes/class-hc-posts.php';  
 function hc_posts() {
@@ -79,10 +82,36 @@ global $debug;
 function hcwp_debug_in_footer() {
     
     global $debug;
+   
+// TODO: it is not showing multiple ids     
+/*    
+    // do something here with debug 
+    $cats1 = 'post-surgery,pre-surgery​';
+    $cats2 = '15,16';
+    $cats3 = '16,15';
+    $cats4 = ['post-surgery','pre-surgery​'];
+    $cats5 = ['15','16'];
+    $cats6 = [15,16];
+    $cats7 = ['15'];
+    $cats8 = [15];
+    $cats9 = [];
+    $cats10 = '';
+    $cats11 = ['post-surgery'];
+            
+    $debug['posts1'] = hc_posts()->get_posts_by_category( $cats1 );
+    $debug['posts2'] = hc_posts()->get_posts_by_category( $cats2 );
+    $debug['posts3'] = hc_posts()->get_posts_by_category( $cats3 );
+    $debug['posts4'] = hc_posts()->get_posts_by_category( $cats4 );
+    $debug['posts5'] = hc_posts()->get_posts_by_category( $cats5 );
+    $debug['posts6'] = hc_posts()->get_posts_by_category( $cats6 );
+    $debug['posts7'] = hc_posts()->get_posts_by_category( $cats7 );
+    $debug['posts8'] = hc_posts()->get_posts_by_category( $cats8 );
+    $debug['posts9'] = hc_posts()->get_posts_by_category( $cats9 );
+    $debug['posts10'] = hc_posts()->get_posts_by_category( $cats10 );
+    $debug['posts11'] = hc_posts()->get_posts_by_category( $cats11 );
+*/    
     
-    // do something here with debug     
-    
-    if ( ! empty( $debug ) ) {
+    if ( ! empty( $debug ) && $iteration === 0 ) {
         echo hcwp_dump( $debug );
     }
     
